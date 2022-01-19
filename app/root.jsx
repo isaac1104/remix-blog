@@ -1,31 +1,52 @@
-import {
-  Links,
-  LiveReload,
-  Meta,
-  Outlet,
-  Scripts,
-  ScrollRestoration
-} from "remix";
-
-export function meta() {
-  return { title: "New Remix App" };
-}
+import { Outlet, LiveReload, Link, Links, Meta } from 'remix';
+import globalStyles from '~/styles/global.css';
 
 export default function App() {
   return (
-    <html lang="en">
+    <Document>
+      <Layout>
+        <Outlet />
+      </Layout>
+      {process.env.NODE_ENV === 'development' && <LiveReload />}
+    </Document>
+  );
+}
+
+export const meta = () => ({
+  charset: 'UTF-8',
+  name: 'viewport',
+  content: 'width=device-width, initial-scale=1.0'
+})
+
+export const links = () => [{ rel: 'stylesheet', href: globalStyles }];
+
+function Document({ children, title }) {
+  return (
+    <html lang='en'>
       <head>
-        <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
         <Meta />
         <Links />
+        <title>{title || 'My Remix Blog'}</title>
       </head>
-      <body>
-        <Outlet />
-        <ScrollRestoration />
-        <Scripts />
-        {process.env.NODE_ENV === "development" && <LiveReload />}
-      </body>
+      <body>{children}</body>
     </html>
+  );
+}
+
+function Layout({ children }) {
+  return (
+    <>
+      <nav className='navbar'>
+        <Link to='/' className='logo'>
+          Remix Blog
+        </Link>
+        <ul className='nav'>
+          <li>
+            <Link to='/posts'>Posts</Link>
+          </li>
+        </ul>
+      </nav>
+      <div className='container'>{children}</div>
+    </>
   );
 }

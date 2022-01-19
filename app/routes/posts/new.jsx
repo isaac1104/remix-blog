@@ -7,7 +7,7 @@ export const action = async ({ request }) => {
 
   const fields = { title, body };
 
-  return redirect('/posts');
+  // return redirect('/posts');
 };
 
 export default function NewPost() {

@@ -15,8 +15,8 @@ export default function App() {
 export const meta = () => ({
   charset: 'UTF-8',
   name: 'viewport',
-  content: 'width=device-width, initial-scale=1.0'
-})
+  content: 'width=device-width, initial-scale=1.0',
+});
 
 export const links = () => [{ rel: 'stylesheet', href: globalStyles }];
 
@@ -48,5 +48,16 @@ function Layout({ children }) {
       </nav>
       <div className='container'>{children}</div>
     </>
+  );
+}
+
+export function ErrorBoundary({ error }) {
+  return (
+    <Document>
+      <Layout>
+        <h1>Error</h1>
+        <p>{error.message}</p>
+      </Layout>
+    </Document>
   );
 }

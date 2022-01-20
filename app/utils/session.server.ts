@@ -45,3 +45,34 @@ export async function createUserSession(userId: string, redirectTo: string) {
     },
   });
 }
+
+export function getUserSession(request: Request) {
+  return storage.getSession(request.headers.get('Cookie'));
+}
+
+export async function getUser(request: Request) {
+  const session = await getUserSession(request);
+  const userId = session.get('userId');
+
+  if (!userId || typeof userId !== 'string') return null;
+
+  try {
+    const user = await db.user.findUnique({
+      where: {
+        id: userId,
+      },
+    });
+    return user;
+  } catch (error) {
+    return null;
+  }
+}
+
+export async function logout(request: Request) {
+  const session = await storage.getSession(request.headers.get('Cookie'));
+  return redirect('/auth/logout', {
+    headers: {
+      'Set-Cookie': await storage.destroySession(session),
+    },
+  });
+}

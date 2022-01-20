@@ -7,7 +7,7 @@ async function seed() {
       username: 'isaac1104',
       // password: Password1
       passwordHash:
-        '$2y$10$rprunma2qVukVpKblNjAxuwLgXoVup51quya7oDqIAb0c.0xrN1fS',
+        '$2a$12$thbtVCr6MCx6mh08Zwh5Huq8EwkNG.9IdGzUsBh1ol1SvXtTQp.RS',
     },
   });
 

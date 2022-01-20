@@ -1,6 +1,7 @@
 import { useActionData, json, redirect } from 'remix';
 import badRequest from '~/utils/badRequest';
 import { db } from '~/utils/db.server';
+import { createUserSession, login } from '~/utils/session.server';
 import validateField from '~/utils/validateField';
 
 export const action = async ({ request }) => {
@@ -21,7 +22,18 @@ export const action = async ({ request }) => {
   }
 
   switch (loginType) {
-    case 'login':
+    case 'login': {
+      const user = await login({ username, password });
+
+      if (!user) {
+        return badRequest({
+          fields,
+          fieldErrors: { username: 'Invalid credentials' },
+        });
+      }
+
+      return createUserSession(user.id, '/posts');
+    }
     case 'register':
     default:
       return badRequest({

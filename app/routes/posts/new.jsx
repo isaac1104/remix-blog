@@ -1,12 +1,14 @@
 import { Link, redirect, useActionData, json } from 'remix';
 import badRequest from '~/utils/badRequest';
 import { db } from '~/utils/db.server';
+import { getUser } from '~/utils/session.server';
 import validateField from '~/utils/validateField';
 
 export const action = async ({ request }) => {
   const form = await request.formData();
   const title = form.get('title');
   const body = form.get('body');
+  const user = await getUser(request);
 
   const fields = { title, body };
 
@@ -16,10 +18,10 @@ export const action = async ({ request }) => {
   };
 
   if (Object.values(fieldErrors).some(Boolean)) {
-    return badRequest({ fieldErrors, fields })
+    return badRequest({ fieldErrors, fields });
   }
 
-  const { id } = await db.post.create({ data: fields });
+  const { id } = await db.post.create({ data: { ...fields, userId: user.id } });
 
   return redirect(`/posts/${id}`);
 };

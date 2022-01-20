@@ -1,11 +1,7 @@
 import { Link, redirect, useActionData, json } from 'remix';
+import badRequest from '~/utils/badRequest';
 import { db } from '~/utils/db.server';
-
-function validateField({ field, value }) {
-  if (typeof value !== 'string' || value.length < 3) {
-    return `${field} should be at least 3 characters long.`;
-  }
-}
+import validateField from '~/utils/validateField';
 
 export const action = async ({ request }) => {
   const form = await request.formData();
@@ -20,7 +16,7 @@ export const action = async ({ request }) => {
   };
 
   if (Object.values(fieldErrors).some(Boolean)) {
-    return json({ fieldErrors, fields }, { status: 400 });
+    return badRequest({ fieldErrors, fields })
   }
 
   const { id } = await db.post.create({ data: fields });
@@ -29,7 +25,7 @@ export const action = async ({ request }) => {
 };
 
 export default function NewPost() {
-  const { fieldErrors, fields } = useActionData();
+  const actionData = useActionData();
 
   return (
     <>
@@ -47,17 +43,26 @@ export default function NewPost() {
               type='text'
               name='title'
               id='title'
-              defaultValue={fields?.title}
+              defaultValue={actionData?.fields?.title}
             />
             <div className='error'>
-              <p>{fieldErrors?.title && fieldErrors.title}</p>
+              <p>
+                {actionData?.fieldErrors?.title &&
+                  actionData?.fieldErrors?.title}
+              </p>
             </div>
           </div>
           <div className='form-control'>
             <label htmlFor='body'>Post Body</label>
-            <textarea name='body' id='body' defaultValue={fields?.body} />
+            <textarea
+              name='body'
+              id='body'
+              defaultValue={actionData?.fields?.body}
+            />
             <div className='error'>
-              <p>{fieldErrors?.body && fieldErrors.body}</p>
+              <p>
+                {actionData?.fieldErrors?.body && actionData?.fieldErrors?.body}
+              </p>
             </div>
           </div>
           <button type='submit' className='btn btn-block'>

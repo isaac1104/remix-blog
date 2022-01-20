@@ -1,7 +1,7 @@
 import { useActionData, json, redirect } from 'remix';
 import badRequest from '~/utils/badRequest';
 import { db } from '~/utils/db.server';
-import { createUserSession, login } from '~/utils/session.server';
+import { createUserSession, login, register } from '~/utils/session.server';
 import validateField from '~/utils/validateField';
 
 export const action = async ({ request }) => {
@@ -34,7 +34,33 @@ export const action = async ({ request }) => {
 
       return createUserSession(user.id, '/posts');
     }
-    case 'register':
+    case 'register': {
+      const userExists = await db.user.findFirst({
+        where: {
+          username,
+        },
+      });
+
+      if (userExists) {
+        return badRequest({
+          fields,
+          fieldErrors: {
+            username: `User ${username} already exists`,
+          },
+        });
+      }
+
+      const user = await register({ username, password });
+
+      if (!user) {
+        return badRequest({
+          fields,
+          formError: 'Something went wrong',
+        });
+      }
+
+      return createUserSession(user.id, '/posts');
+    }
     default:
       return badRequest({
         fields,
